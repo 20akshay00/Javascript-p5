@@ -5,7 +5,7 @@ let scale = 100;
 let aSlider, tSlider, lSlider; //Sliders
 
 let simPar = {
-  theta: 0, //angle
+  theta: 0.1, //angle
   omega: 0, //angular velocity
   alpha: 0, //angular acceleration
   dt: 0.01, // Initial time step size
@@ -44,7 +44,7 @@ function setup() {
   tSlider.position(140, 10);
   tSlider.style('width', '90px');
 
-  lSlider = createSlider(0, 2, 1, 0.01); //length slider
+  lSlider = createSlider(0.01, 2, 1, 0.01); //length slider
   lSlider.position(270, 10);
   lSlider.style('width', '90px');
 }
@@ -56,7 +56,7 @@ function draw() {
   fill(135, 135, 154);
   rect(0, 0, 400, simPar.hinge[1])
 
-  fill(0, 0, 0)
+  fill(0, 0, 0);
   text("Angle in degrees:", 10, 40);
   text((aSlider.value() * 360 / (2 * PI)).toFixed(2), 100, 40);
 
@@ -66,18 +66,29 @@ function draw() {
   text("length in m: ", 270, 40);
   text(lSlider.value().toFixed(2), 336, 40);
 
-
+  stroke(0, 0, 0);
   line(0, simPar.hinge[1], 400, simPar.hinge[1]); //Plots background lines
   line(simPar.hinge[0], simPar.hinge[1], simPar.hinge[0] + scale * simPar.length * sin(simPar.theta), simPar.hinge[1] + scale * simPar.length * cos(simPar.theta));
-  linedash(200, simPar.hinge[1], 200, simPar.hinge[1] + scale * simPar.length, [5])
+  linedash(simPar.hinge[0], simPar.hinge[1], simPar.hinge[0], simPar.hinge[1] + scale * simPar.length, [5])
 
   fill(51, 153, 255); //Plots the pendulum
   ellipse(simPar.hinge[0] + scale * simPar.length * sin(simPar.theta), simPar.hinge[1] + scale * simPar.length * cos(simPar.theta), 20, 20);
   ellipse(simPar.hinge[0], simPar.hinge[1], 5, 5)
 
+
+  fill(153, 204, 255); //plots the arc of angle made with vertical
+  stroke(0, 0, 0);
+  if (simPar.theta > 0) {
+    arc(simPar.hinge[0], simPar.hinge[1], scale * simPar.length / 2, scale * simPar.length / 2, PI / 2 - simPar.theta, PI / 2);
+  } else {
+    arc(simPar.hinge[0], simPar.hinge[1], scale * simPar.length / 2, scale * simPar.length / 2, PI / 2, PI / 2 - simPar.theta);
+  }
+  noStroke();
+
   //rect(45, 325, 90, 20); //experimental; to display time
   //fill(color(255, 255, 255))
   //text("Time: " + (nIter++ * simPar.dt).toFixed(2) + " secs", 50, 340)
+  simPar.length = lSlider.value();
 
   simPar.alpha = -simPar.g * sin(simPar.theta) / simPar.length;
   simPar.omega += simPar.alpha * simPar.dt;
