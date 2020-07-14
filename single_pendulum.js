@@ -32,9 +32,11 @@ function setup() {
     simPar.theta = aSlider.value();
     simPar.dt = tSlider.value();
     simPar.length = lSlider.value();
+    simPar.omega = 0;
+    simPar.alpha = 0;
   })
 
-  aSlider = createSlider(-3.14 / 2, 3.14 / 2, 1.0, 0.01); //angle slider
+  aSlider = createSlider(-3.14 / 2, 3.14 / 2, 3.14 / 4, 0.01); //angle slider
   aSlider.position(10, 10);
   aSlider.style('width', '90px');
 
