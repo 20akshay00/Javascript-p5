@@ -2,18 +2,18 @@ let L = 800; //x length of canvas
 let W = 400; //y length of canvas
 let scale = 100;
 let offset = 2.5;
-let fskip = 0;
+let fSlider;
 let lSlider, lcSlider, kSlider;
 let mInput1, mInput2, aInput1, aInput2;
 let sButton, pButton;
-let x1, x2, y1, y2, sAngle, d;
+let sAngle, d;
 let nIter = 0;
 
 let par = {
   theta: [0, 0], // [Initial angle 1, Initial angle 2]
   omega: [0, 0],
   alpha: [0, 0],
-  dt: 0.001, // Initial time step size
+  dt: 0.01, // Initial time step size
   mass: [1, 1], // [Mass of pendulum 1, Mass of pendulum 2]
   length: [1, 1], // [Pendulum length, Coupling length]
   k: 0.5, //Spring constant
@@ -46,6 +46,10 @@ function setup() {
   kSlider = createSlider(0, 2.0, 0.5, 0.1); //length slider
   kSlider.position(10, 50);
   kSlider.style('width', '90px');
+
+  fSlider = createSlider(1, 100, 50, 1); //frameskip slider
+  fSlider.position(L / 3 - 50, 373);
+  fSlider.style('width', '90px');
 
   mInput1 = createInput();
   mInput1.position(10, 364);
@@ -80,7 +84,6 @@ function setup() {
 function draw() {
   background(bg);
 
-
   fill(0, 0, 0);
   strokeWeight(0);
   text("Length (m): " + lSlider.value().toFixed(2), 110, 25);
@@ -88,7 +91,7 @@ function draw() {
   text("Spring constant (N/m): " + kSlider.value().toFixed(2), 110, 65);
   text("Mass (kg)", 95, 384);
   text("Initial angle (°)", 2 * L / 3 - 180, 384)
-
+  text("Frameskip : " + fSlider.value(), L / 3 - 50, 374)
 
   strokeWeight(3);
   stroke(0, 0, 0);
@@ -112,27 +115,26 @@ function draw() {
   fill(51, 153, 255); //Plots the pendulum
   ellipse(par.hinge[1][0] + scale * par.length[0] * sin(par.theta[1]), par.hinge[1][1] + scale * par.length[0] * cos(par.theta[1]), 15 * (par.mass[1]) ** 0.25, 15 * (par.mass[1]) ** 0.25);
 
+  stroke(160, 160, 160);
+  linedash(par.hinge[0][0] + scale * par.length[0] * sin(par.theta[0]), par.hinge[0][1] + scale * par.length[0] * cos(par.theta[0]), par.hinge[1][0] + scale * par.length[0] * sin(par.theta[1]), par.hinge[1][1] + scale * par.length[0] * cos(par.theta[1]), [3])
+  stroke(0, 0, 0);
   //update values of parameters
   par.length = [lSlider.value(), lcSlider.value()];
   par.k = kSlider.value();
   par.hinge[0] = [par.center[0] - scale * par.length[1] / 2, par.center[1]];
   par.hinge[1] = [par.center[0] + scale * par.length[1] / 2, par.center[1]];
 
-  x1 = par.hinge[0][0] + par.length[0] * sin(par.theta[0]);
-  y1 = par.hinge[0][1] + par.length[0] * cos(par.theta[0]);
-  x2 = par.hinge[1][0] + par.length[0] * sin(par.theta[1]);
-  y2 = par.hinge[1][1] + par.length[0] * cos(par.theta[1]);
+  for (let i = 0; i < fSlider.value(); i++) {
+    d = ((par.length[0] * (cos(par.theta[1]) - cos(par.theta[0]))) ** 2 + (par.length[1] - par.length[0] * sin(par.theta[1]) + par.length[0] * sin(par.theta[0])) ** 2) ** 0.5;
+    sAngle = atan((cos(par.theta[1]) - cos(par.theta[0])) / (par.length[1] / par.length[0] - sin(par.theta[1]) + sin(par.theta[0])));
 
-  d = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-  sAngle = acos(abs(x2 - x1) / d);
-
-  par.alpha[0] = -par.g * sin(par.theta[0]) - par.k * (d - par.length[1]) * cos(par.theta[0] + sAngle) / (par.mass[0] * par.length[0]);
-  par.alpha[1] = -par.g * sin(par.theta[1]) + par.k * (d - par.length[1]) * cos(par.theta[1] + sAngle) / (par.mass[1] * par.length[0]);
-  par.omega[0] += par.alpha[0] * par.dt;
-  par.omega[1] += par.alpha[1] * par.dt;
-  par.theta[0] += par.omega[0] * par.dt;
-  par.theta[1] += par.omega[1] * par.dt;
-
+    par.alpha[0] = -par.g * sin(par.theta[0]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[0] + sAngle) / (par.mass[0] * par.length[0]);
+    par.alpha[1] = -par.g * sin(par.theta[1]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[1] - sAngle) / (par.mass[1] * par.length[0]);
+    par.omega[0] += par.alpha[0] * par.dt;
+    par.omega[1] += par.alpha[1] * par.dt;
+    par.theta[0] += par.omega[0] * par.dt;
+    par.theta[1] += par.omega[1] * par.dt;
+  }
 }
 
 
