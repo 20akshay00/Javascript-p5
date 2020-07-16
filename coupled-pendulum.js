@@ -13,7 +13,7 @@ let par = {
   theta: [0, 0], // [Initial angle 1, Initial angle 2]
   omega: [0, 0],
   alpha: [0, 0],
-  dt: 0.01, // Initial time step size
+  dt: 0.001, // Initial time step size
   mass: [1, 1], // [Mass of pendulum 1, Mass of pendulum 2]
   length: [1, 1], // [Pendulum length, Coupling length]
   k: 0.5, //Spring constant
@@ -47,7 +47,7 @@ function setup() {
   kSlider.position(10, 50);
   kSlider.style('width', '90px');
 
-  fSlider = createSlider(1, 100, 50, 1); //frameskip slider
+  fSlider = createSlider(1, 1000, 50, 1); //frameskip slider
   fSlider.position(L / 3 - 50, 373);
   fSlider.style('width', '90px');
 
@@ -124,11 +124,13 @@ function draw() {
   par.hinge[0] = [par.center[0] - scale * par.length[1] / 2, par.center[1]];
   par.hinge[1] = [par.center[0] + scale * par.length[1] / 2, par.center[1]];
 
+
+  //code to evolve in time; Euler scheme 
   for (let i = 0; i < fSlider.value(); i++) {
     d = ((par.length[0] * (cos(par.theta[1]) - cos(par.theta[0]))) ** 2 + (par.length[1] - par.length[0] * sin(par.theta[1]) + par.length[0] * sin(par.theta[0])) ** 2) ** 0.5;
     sAngle = atan((cos(par.theta[1]) - cos(par.theta[0])) / (par.length[1] / par.length[0] - sin(par.theta[1]) + sin(par.theta[0])));
 
-    par.alpha[0] = -par.g * sin(par.theta[0]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[0] + sAngle) / (par.mass[0] * par.length[0]);
+    par.alpha[0] = -par.g * sin(par.theta[0]) / par.length[0] - par.k * (d - par.length[1]) * cos(par.theta[0] + sAngle) / (par.mass[0] * par.length[0]);
     par.alpha[1] = -par.g * sin(par.theta[1]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[1] - sAngle) / (par.mass[1] * par.length[0]);
     par.omega[0] += par.alpha[0] * par.dt;
     par.omega[1] += par.alpha[1] * par.dt;
