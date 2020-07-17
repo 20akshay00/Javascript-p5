@@ -16,13 +16,13 @@ let par = {
   dt: 0.001, // Initial time step size
   mass: [1, 1], // [Mass of pendulum 1, Mass of pendulum 2]
   length: [1, 1], // [Pendulum length, Coupling length]
-  k: 0.5, //Spring constant
+  k: 0.5 / 100, //Spring constant
   center: [L / 3, 3 * W / 10], //midpoint of hinges
   hinge: [
     [L / 3 - 50, 3 * W / 10], //hinge of pendulum 1
     [L / 3 + 50, 3 * W / 10] //hinge of pendulum 2
   ],
-  g: 9.8 / 3600
+  g: 9.8 / 100
 };
 
 function linedash(x1, y1, x2, y2, list) {
@@ -73,7 +73,7 @@ function setup() {
     par.theta = [(aInput1.value() % 90) * PI / 180, (aInput2.value() % 90) * PI / 180];
     par.length = [lSlider.value(), lcSlider.value()];
     par.mass = [mInput1.value(), mInput2.value()];
-    par.k = kSlider.value();
+    par.k = kSlider.value() / 100;
     par.omega = [0, 0];
     par.alpha = [0, 0];
     par.hinge[0] = [par.center[0] - scale * par.length[1] / 2, par.center[1]];
@@ -120,26 +120,25 @@ function draw() {
   stroke(0, 0, 0);
   //update values of parameters
   par.length = [lSlider.value(), lcSlider.value()];
-  par.k = kSlider.value();
+  par.k = kSlider.value() / 100;
   par.hinge[0] = [par.center[0] - scale * par.length[1] / 2, par.center[1]];
   par.hinge[1] = [par.center[0] + scale * par.length[1] / 2, par.center[1]];
 
 
-  //code to evolve in time; Euler scheme 
+  //code to evolve in time; Euler scheme
   for (let i = 0; i < fSlider.value(); i++) {
-    d = ((par.length[0] * (cos(par.theta[1]) - cos(par.theta[0]))) ** 2 + (par.length[1] - par.length[0] * sin(par.theta[1]) + par.length[0] * sin(par.theta[0])) ** 2) ** 0.5;
-    sAngle = atan((cos(par.theta[1]) - cos(par.theta[0])) / (par.length[1] / par.length[0] - sin(par.theta[1]) + sin(par.theta[0])));
+    d = ((par.length[0] * (cos(par.theta[0]) - cos(par.theta[1]))) ** 2 + (par.length[1] + par.length[0] * sin(par.theta[1]) - par.length[0] * sin(par.theta[0])) ** 2) ** 0.5;
+    sAngle = atan((-cos(par.theta[1]) + cos(par.theta[0])) / (par.length[1] / par.length[0] + sin(par.theta[1]) - sin(par.theta[0])));
 
-    par.alpha[0] = -par.g * sin(par.theta[0]) / par.length[0] - par.k * (d - par.length[1]) * cos(par.theta[0] + sAngle) / (par.mass[0] * par.length[0]);
-    par.alpha[1] = -par.g * sin(par.theta[1]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[1] - sAngle) / (par.mass[1] * par.length[0]);
+    par.alpha[0] = -par.g * sin(par.theta[0]) / par.length[0] + par.k * (d - par.length[1]) * cos(par.theta[0] - sAngle) / (par.mass[0] * par.length[0]);
+    par.alpha[1] = -par.g * sin(par.theta[1]) / par.length[0] - par.k * (d - par.length[1]) * cos(par.theta[1] - sAngle) / (par.mass[1] * par.length[0]);
     par.omega[0] += par.alpha[0] * par.dt;
     par.omega[1] += par.alpha[1] * par.dt;
     par.theta[0] += par.omega[0] * par.dt;
     par.theta[1] += par.omega[1] * par.dt;
+
   }
 }
-
-
 
 
 
