@@ -21,7 +21,6 @@ let par = {
   hinge: [L / 3, 3 * W / 10] //hinge position
 }
 
-
 function linedash(x1, y1, x2, y2, list) {
   drawingContext.setLineDash(list); // set the "dashed line" mode
   line(x1, y1, x2, y2); // draw the line
@@ -69,7 +68,7 @@ function setup() {
     plot1.getMainLayer().points = [];
     plot2.getMainLayer().points = [];
     pos = [];
-  })
+  });
 
   cButton = createButton('Clear'); //CLEAR button
   cButton.position(325, 30);
@@ -139,6 +138,7 @@ function draw() {
   //update values of parameters
   par.l0 = l0Slider.value();
   par.k = kSlider.value() / 100;
+
 
   //code to evolve in time; Euler scheme
   for (let i = 0; i < fSlider.value(); i++) {
