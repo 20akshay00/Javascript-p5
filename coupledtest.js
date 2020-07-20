@@ -118,9 +118,12 @@ function draw() {
   text("Frameskip : " + fSlider.value(), L / 3 - 50, 374)
   text("Framerate: " + int(getFrameRate()), 10, 200);
 
-  strokeWeight(3);
-  stroke(0, 0, 0);
+  //plots spring
+  strokeWeight(2);
+  drawspring(par.hinge[0][0] + scale * par.length[0] * sin(par.theta[0]), par.hinge[0][1] + scale * par.length[0] * cos(par.theta[0]), par.hinge[1][0] + scale * par.length[0] * sin(par.theta[1]), par.hinge[1][1] + scale * par.length[0] * cos(par.theta[1]), scale * par.length[1], true)
+  stroke(0);
 
+  strokeWeight(3)
   //line of suspension of pendulum
   line(par.center[0] - 2 * L / 9, par.center[1], par.center[0] + 2 * L / 9, par.center[1]);
   stroke(0, 0, 0);
@@ -140,9 +143,6 @@ function draw() {
   fill(51, 153, 255); //Plots the pendulum
   ellipse(par.hinge[1][0] + scale * par.length[0] * sin(par.theta[1]), par.hinge[1][1] + scale * par.length[0] * cos(par.theta[1]), 15 * (par.mass[1]) ** 0.25, 15 * (par.mass[1]) ** 0.25);
 
-  stroke(160, 160, 160);
-  linedash(par.hinge[0][0] + scale * par.length[0] * sin(par.theta[0]), par.hinge[0][1] + scale * par.length[0] * cos(par.theta[0]), par.hinge[1][0] + scale * par.length[0] * sin(par.theta[1]), par.hinge[1][1] + scale * par.length[0] * cos(par.theta[1]), [3])
-  stroke(0, 0, 0);
   //update values of parameters
   par.length = [lSlider.value(), lcSlider.value()];
   par.k = kSlider.value() / 100;
